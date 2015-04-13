@@ -69,4 +69,43 @@
     (println
         (update-in person [:employer :address :zip] str "-1234"))
 
+
+    (defn parting
+        "the only thing better than meeting is parting"
+        [name]
+        (str "G'day to ya ", name))
+
+    (println (parting "Seth"))
+
+    (defn power [base & exponents]
+        (reduce #(Math/pow %1 %2) base exponents))
+
+    (println (power 2 3 4))
+
+    (defn parting
+        "automate the best part of meeting someone"
+        ([] (parting "World"))
+        ([name] (parting name "en"))
+        ([name language]
+            (condp = language
+                "en" (str "Goodbye, " name)
+                "es" (str "Adios, " name)
+                (throw (IllegalArgumentException.
+                    (str "unsupported language " language))))))
+
+    (println (parting))
+    (println (parting "Seth"))
+    (println (parting "Seth" "es"))
+    ;;(println (parting "Seth" "xy"))
+
+    (def years [1940 1944 1961 1985 1987])
+    (println (filter (fn [year] (even? year)) years))
+    (println (filter #(even? %) years))
+
+
+    (defn pair-test [test-fn n1 n2]
+        (if (test-fn n1 n2) "pass" "fail"))
+
+    (println (pair-test #(even? (+ %1 %2)) 3 5))
+
  (println "Hello, World!"))
