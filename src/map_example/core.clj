@@ -1,6 +1,34 @@
 (ns map-example.core
   (:gen-class))
 
+(defn exception-handling []
+    (defn collection? [obj]
+        (println "obj is a" (class obj))
+        (or (coll? obj)
+            (instance? java.util.Collection obj)))
+
+    (defn average [coll]
+        (when-not (collection? coll)
+            (throw (IllegalArgumentException. "expected a collection")))
+        (when (empty? coll)
+            (throw (IllegalArgumentException. "collection is empty")))
+        (let [sum (apply + coll)]
+            (/ sum (count coll))))
+
+    (try
+        (println "list average =" (average '(2 3)))
+        (println "vector average =" (average [2 3]))
+        (println "set average =" (average #{2 3}))
+        (let [a1 (java.util.ArrayList.)]
+            (doto a1 (.add 2) (.add 3))
+            (println "ArrayList average =" (average a1)))
+        (println "string average =" (average "1 2 3 4"))
+        (catch IllegalArgumentException e
+            (println e)
+            (.printStackTrace e)
+        )
+        (finally
+            (println "in finally"))))
 
 
 (defn -main
@@ -108,4 +136,34 @@
 
     (println (pair-test #(even? (+ %1 %2)) 3 5))
 
- (println "Hello, World!"))
+    (defn- polynomial
+        "computes a point value of a polynomial"
+        [coefs x]
+        (let [exponents (reverse (range (count coefs)))]
+            (apply + (map #(* %1 (Math/pow x %2)) coefs exponents))))
+
+    (defn- derivative
+        [coefs x]
+        (let [exponents (reverse (range (count coefs)))
+            derivative-coefs (map #(* %1 %2) (butlast coefs) exponents)]
+            (polynomial derivative-coefs x)))
+
+
+    (def f (partial polynomial [2 1 3]))
+    (def f-prime (partial derivative [2 1 3]))
+
+    (println "f(2) =" (f 2))
+    (println "f'(2) =" (f-prime 2))
+    (def memo-f (memoize f))
+
+    (println "priming call")
+    (time (f 2))
+
+    (println "without memoization")
+    (dotimes [_ 3] (time (f 2)))
+
+    (println "with memoization")
+    (dotimes [_ 3] (time (memo-f 2)))
+
+    (exception-handling)
+)
